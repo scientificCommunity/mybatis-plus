@@ -57,7 +57,7 @@ public class TableFieldInfo implements Constants {
     private final String property;
 
 
-    private final boolean isObjectType = false;
+    private final boolean isObjectType;
 
     private final String objectTypeName;
     /**
@@ -199,6 +199,7 @@ public class TableFieldInfo implements Constants {
     public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, TableField tableField,
                           Reflector reflector, boolean existTableLogic) {
         field.setAccessible(true);
+        this.isObjectType = tableField.isObjectType();
         this.field = field;
         this.version = field.getAnnotation(Version.class) != null;
         this.property = field.getName();
@@ -327,6 +328,7 @@ public class TableFieldInfo implements Constants {
     public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, Reflector reflector,
                           boolean existTableLogic) {
         field.setAccessible(true);
+        this.isObjectType = false;
         this.field = field;
         this.version = field.getAnnotation(Version.class) != null;
         this.property = field.getName();
