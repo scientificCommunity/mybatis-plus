@@ -55,6 +55,11 @@ public class TableFieldInfo implements Constants {
      * 属性名
      */
     private final String property;
+
+
+    private final boolean isObjectType = false;
+
+    private final String objectTypeName;
     /**
      * 属性表达式#{property}, 可以指定jdbcType, typeHandler等
      */
@@ -263,6 +268,8 @@ public class TableFieldInfo implements Constants {
         }
 
         this.column = column;
+        this.objectTypeName = column;
+
         this.sqlSelect = column;
         if (needAs) {
             // 存在指定转换属性
@@ -349,6 +356,8 @@ public class TableFieldInfo implements Constants {
         }
 
         this.column = column;
+        this.objectTypeName = column;
+
         this.sqlSelect = column;
         if (tableInfo.getResultMap() == null && !tableInfo.isAutoInitResultMap() &&
             TableInfoHelper.checkRelated(tableInfo.isUnderCamel(), this.property, this.column)) {
@@ -424,7 +433,7 @@ public class TableFieldInfo implements Constants {
      */
     public String getInsertSqlProperty(final String prefix) {
         final String newPrefix = prefix == null ? EMPTY : prefix;
-        return SqlScriptUtils.safeParam(newPrefix + el) + COMMA;
+        return checkFieldTypeIsObjectType(SqlScriptUtils.safeParam(newPrefix + el)) + COMMA;
     }
 
     /**
@@ -527,8 +536,23 @@ public class TableFieldInfo implements Constants {
         final String newPrefix = prefix == null ? EMPTY : prefix;
         // 默认:  AND column=#{prefix + el}
         String sqlScript = " AND " + String.format(condition, column, newPrefix + el);
+
+        sqlScript = checkFieldTypeIsObjectType(sqlScript);
+
         // 查询的时候只判非空
         return convertIf(sqlScript, convertIfProperty(newPrefix, property), whereStrategy);
+    }
+
+    /**
+     * 如果字段类型是postgres object type，则按相应语法规则进行额外处理
+     *
+     * @return 处理后的sqlScript
+     */
+    private String checkFieldTypeIsObjectType(String sqlScript) {
+        if (this.isObjectType) {
+            sqlScript += "::" + this.objectTypeName;
+        }
+        return sqlScript;
     }
 
     /**

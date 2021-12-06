@@ -121,6 +121,20 @@ public @interface TableField {
     boolean select() default true;
 
     /**
+     * 字段类型是否是postgres的object type
+     *
+     * @return _
+     */
+    boolean isObjectType() default false;
+
+    /**
+     * postgres的object type的名称，需要在{@link TableField#isObjectType()} 为true时有效 },默认取字段名
+     *
+     * @return _
+     */
+    String objectTypeName() default "";
+
+    /**
      * 是否保持使用全局的 columnFormat 的值
      * <p>
      * 只生效于 既设置了全局的 columnFormat 也设置了上面 {@link #value()} 的值
